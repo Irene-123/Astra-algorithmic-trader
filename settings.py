@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 
 # GLOBAL PATHS
 # ===========================================================================================
@@ -8,10 +9,20 @@ MODULES_DIRECTORY = os.path.join(BASE, "lib/modules")
 LIVE_DATA_FETCH_DIRECTORY = os.path.join(MODULES_DIRECTORY, "live_data_fetch")
 BROKER_CREDENTIALS_FILE = os.path.join(LIVE_DATA_FETCH_DIRECTORY, "broker_credentials.json")
 SCRIP_MASTER_FILE = os.path.join(LIVE_DATA_FETCH_DIRECTORY, "script_master.csv")
+LOGS_DIR = os.path.join(BASE, "logs")
+
+# LOGS
+VERBOSE = True
+STREAM_HANDLER_LOGGING_LEVEL = logging.INFO
+FILE_HANDLER_LOGGING_LEVEL = logging.INFO
+LOG_FILE_PATHS = {
+    "DEFAULT": os.path.join(LOGS_DIR, "default.log"),
+    "BROKER": os.path.join(LOGS_DIR, "broker.log")
+}
 
 # CREATION OF DIRECTORIES
 # ===========================================================================================
-EXECUTION_DIRECTORIES = []
+EXECUTION_DIRECTORIES = [LOGS_DIR]
 for directory in EXECUTION_DIRECTORIES:
     if not os.path.exists(directory):
         os.makedirs(directory)
