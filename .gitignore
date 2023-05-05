@@ -1,0 +1,10 @@
+venv/
+.DS_Store
+ASTRA_5paisa_data/lib/ui/__pycache__/
+socket_data.csv
+ASTRA_5paisa_data/lib/modules/live_data_fetch/script_master.csv
+ASTRA_5paisa_data/lib/ui/raw/__pycache__/
+ASTRA_5paisa_data/lib/modules/live_data_fetch/__pycache__/
+ASTRA_5paisa_data/lib/ui/raw/main_window.ui
+ASTRA_5paisa_data/broker_credentials.json
+ASTRA_5paisa_data/lib/modules/live_data_fetch/broker_credentials.json
