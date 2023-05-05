@@ -1,4 +1,4 @@
-from lib.modules.live_data_fetch.API_client import API
+from lib.modules.live_data_fetch.api_client import API
 import settings as settings
 import os
 

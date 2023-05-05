@@ -1,4 +1,4 @@
-from lib.modules.live_data_fetch.API_client import API
+from lib.modules.live_data_fetch.api_client import API
 
 def test_client_connection():
     """Test connection establishment with the broker, for two factor authentication process,

@@ -8,7 +8,6 @@ MODULES_DIRECTORY = os.path.join(BASE, "lib/modules")
 LIVE_DATA_FETCH_DIRECTORY = os.path.join(MODULES_DIRECTORY, "live_data_fetch")
 BROKER_CREDENTIALS_FILE = os.path.join(LIVE_DATA_FETCH_DIRECTORY, "broker_credentials.json")
 SCRIP_MASTER_FILE = os.path.join(LIVE_DATA_FETCH_DIRECTORY, "script_master.csv")
-UI_DIRECTORY = os.path.join(BASE, "lib/ui")
 
 # CREATION OF DIRECTORIES
 # ===========================================================================================
@@ -33,7 +32,7 @@ if not os.path.exists(BROKER_CREDENTIALS_FILE):
         "ENCRYPTION_KEY": ""
     }
     with open(BROKER_CREDENTIALS_FILE, "w") as file:
-        json.dump(broker_cred, file)
+        json.dump(broker_cred, file, indent=4)
    
 # GLOBAL VARIABLES
 # ===========================================================================================     

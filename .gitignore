@@ -1,2 +1,5 @@
-.gitignore
 astra_env
+**credentials**
+**__pycache__
+.vscode
+.pytest_cache

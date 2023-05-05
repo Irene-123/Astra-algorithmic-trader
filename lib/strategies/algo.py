@@ -1,4 +1,4 @@
-from lib.modules.live_data_fetch.API_client import API
+from lib.modules.live_data_fetch.api_client import API
 obj = API()
 client= obj.client
 import time 
