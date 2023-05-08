@@ -1,0 +1,2 @@
+class BrokerObjectNotCreatedException(Exception):
+    pass
