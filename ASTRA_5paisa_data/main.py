@@ -1,5 +1,5 @@
 import sys
-import settings as settings
+import ASTRA.settings as settings
 
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtCore import QTimer

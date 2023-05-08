@@ -1,5 +1,5 @@
 from lib.modules.live_data_fetch.API_client import API
-import settings as settings
+import ASTRA.settings as settings
 import os
 
 def test_scrip_master_download():

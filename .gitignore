@@ -8,3 +8,4 @@ ASTRA_5paisa_data/lib/modules/live_data_fetch/__pycache__/
 ASTRA_5paisa_data/lib/ui/raw/main_window.ui
 ASTRA_5paisa_data/broker_credentials.json
 ASTRA_5paisa_data/lib/modules/live_data_fetch/broker_credentials.json
+ASTRA_5paisa_data/__pycache__/

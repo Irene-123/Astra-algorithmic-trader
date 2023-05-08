@@ -4,7 +4,7 @@ from datetime import datetime
 import json
 import os
 import pandas as pd
-import settings
+import ASTRA_5paisa_data.settings as settings
 
 
 class API:
