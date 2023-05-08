@@ -43,7 +43,7 @@ if not os.path.exists(BROKER_CREDENTIALS_FILE):
         "ENCRYPTION_KEY": ""
     }
     with open(BROKER_CREDENTIALS_FILE, "w") as file:
-        json.dump(broker_cred, file)
+        json.dump(broker_cred, file, indent=4)
 SCRIPS=['NIFTY50', 'SBIN', 'TITAN', 'FOSECOIND', 'HDFCBANK', 'MRF', 'AMBUJACEM', 'TATAMOTORS']
    
 # GLOBAL VARIABLES
