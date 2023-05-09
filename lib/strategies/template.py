@@ -4,13 +4,16 @@ import json
 import threading
 from multiprocessing import Queue
 
+from utils.logger import get_logger
+
 
 class Strategy(ABC):
-    def __init__(self, manager_ipc:Queue) -> None:
+    def __init__(self, name:str, manager_ipc:Queue) -> None:
         self.ticker_port = 12380
         self.ticker_data = {}
+        self.name = name
         self.manager_ipc = manager_ipc
-        self.run_strategy()
+        self.logger = get_logger(logger_name=name)
 
     def start_live_feed(self, scrip_codes:list):
         """Starts live feed from the broker manager

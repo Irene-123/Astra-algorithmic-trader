@@ -7,7 +7,7 @@ from lib.strategies.template import Strategy
 
 class TowardsSMA(Strategy):
     def __init__(self, manager_ipc: Queue) -> None:
-        super().__init__(manager_ipc)
+        super().__init__(name="towards_sma", manager_ipc=manager_ipc)
         self.current_call = {}
         self.historical_data = {}
 

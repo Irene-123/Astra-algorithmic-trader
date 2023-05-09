@@ -15,10 +15,6 @@ LOGS_DIR = os.path.join(BASE, "logs")
 VERBOSE = True
 STREAM_HANDLER_LOGGING_LEVEL = logging.INFO
 FILE_HANDLER_LOGGING_LEVEL = logging.INFO
-LOG_FILE_PATHS = {
-    "DEFAULT": os.path.join(LOGS_DIR, "default.log"),
-    "BROKER": os.path.join(LOGS_DIR, "broker.log")
-}
 
 # CREATION OF DIRECTORIES
 # ===========================================================================================

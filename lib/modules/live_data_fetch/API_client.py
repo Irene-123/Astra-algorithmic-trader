@@ -16,7 +16,7 @@ class Broker:
     """FivePaisa broker instance. Contains functions to interact with FivePaisa API. 
     """
     def __init__(self) -> None:
-        self.logger = get_logger(logger_name="BROKER")
+        self.logger = get_logger(logger_name="five_paisa")
         try:
             with open(settings.BROKER_CREDENTIALS_FILE, 'r') as file:
                 self.broker_credentials = json.load(file)
