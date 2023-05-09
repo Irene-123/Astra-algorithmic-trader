@@ -2,11 +2,11 @@ from abc import ABC, abstractmethod
 import socket
 import json
 import threading
-from multiprocessing.connection import PipeConnection
+from multiprocessing import Queue
 
 
 class Strategy(ABC):
-    def __init__(self, manager_ipc:PipeConnection) -> None:
+    def __init__(self, manager_ipc:Queue) -> None:
         self.ticker_port = 12380
         self.ticker_data = {}
         self.manager_ipc = manager_ipc
@@ -30,18 +30,18 @@ class Strategy(ABC):
         self.live_feed_thread = threading.Thread(target=live_feed, args=())
         self.live_feed_thread.start()
 
-    def send_call(self, call_type:str, call_price:float):
+    def send_call(self, call_type:str, call_price:float=None):
         """Send trade call to the strategy manager
 
         Args:
             call_type (str): BUY or SELL
-            call_price (float): Price of trade
+            call_price (float): Price of trade, None means market order
         """
         call = {
             "call_type": call_type,
             "call_price": call_price
         }
-        self.manager_ipc.send(json.dumps(call))
+        self.manager_ipc.put(call)
 
     def fetch_candle(self, time_interval:str):
         """Fetches historical data for the given time interval
@@ -51,7 +51,10 @@ class Strategy(ABC):
         """
         pass
 
+    def get_historical_data(self, scrip, start_date, end_date, time_interval):
+        pass
+
     @abstractmethod
-    def run_strategy(self):
+    def run_strategy(self, scrips:list):
         pass
 
