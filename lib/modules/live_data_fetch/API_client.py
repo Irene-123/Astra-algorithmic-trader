@@ -6,7 +6,7 @@ from typing import List, Dict
 import pandas as pd
 from py5paisa import FivePaisaClient
 import requests
-
+import threading
 from lib.modules.exceptions.broker_exceptions import *
 from utils.logger import get_logger
 import settings
@@ -28,6 +28,9 @@ class Broker:
         self.fetch_scrip_master()
         self.client = self.login()
         self.socket_data = pd.DataFrame()
+        self.values=[]
+        t = threading.Thread(target=self.subscribe_scrips, args=(['SBIN'],))
+        t.start()
 
     def login(self):
         """Creates a session with the broker (5Paisa) using two factor authentication
@@ -139,16 +142,16 @@ class Broker:
         Args:
             symbol_lists (list[str]): List containing symbols for stock/option/derivative
         """
-        #TODO
         def on_message(ws, message):
             print(ws)
             print(message[1:-1]) 
-            values= json.loads(message[1:-1]) 
-            d = pd.DataFrame([values])
+            self.values= json.loads(message[1:-1]) 
+            d = pd.DataFrame([self.values])
             self.socket_data = pd.concat([self.socket_data, d]) 
             self.socket_data.to_csv(r'socket_data.csv')
 
         request_list = list()
+        print(symbols)
         for symbol in symbols:
             request_list.append({
                 "Exch": self.get_exchange_from_symbol(symbol),
@@ -158,3 +161,5 @@ class Broker:
         req_data = self.client.Request_Feed('mf','s',request_list)  # MarketFeedV3, Subscribe
         self.client.connect(req_data)
         self.client.receive_data(on_message)
+
+
