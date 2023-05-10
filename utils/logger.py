@@ -1,5 +1,6 @@
 import settings
 
+import os
 import logging
 
 
@@ -20,10 +21,7 @@ def get_logger(logger_name:str):
         stream_handler.setFormatter(stream_formatter)
         logger.addHandler(stream_handler)
 
-    if logger_name in settings.LOG_FILE_PATHS.keys():
-        path = settings.LOG_FILE_PATHS[logger_name]
-    else:
-        path = settings.LOG_FILE_PATHS["DEFAULT"]
+    path = os.path.join(settings.LOGS_DIR, logger_name)
         
     file_handler = logging.FileHandler(path)
     file_handler.setLevel(settings.FILE_HANDLER_LOGGING_LEVEL)
