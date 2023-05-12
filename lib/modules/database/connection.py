@@ -5,3 +5,5 @@ def connect_db(url):
     # Create a cursor object to execute SQL queries
     cursor = conn.cursor()
 
+
+

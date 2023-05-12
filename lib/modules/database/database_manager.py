@@ -1,6 +1,6 @@
 import os 
 import psycopg2
-from .connection import connect_db 
+from .connection import * 
 
 class db_stat:
     def __init__(self) -> None:
@@ -14,7 +14,15 @@ class Manager:
         pass
     def connect(self, connection_url):
         self.cursor= connect_db(connection_url)
-    def execute_query(self, query):
-        self.cursor.execute(query) 
+    def add_ohlc_data(self, excel_file): 
+        pass 
+    def add_new_order(self, new_order):
+        pass 
+    def add_new_position(self, new_position):
+        pass 
+    def close_position(self, closed_position): 
+        pass 
+
+
 
 # Run as import database.database_manager obj= Manager() obj.connect(postgresql://kirtipurohit:1234@localhost:127.0.0.1/db_name)

@@ -1,8 +1,10 @@
 from lib.modules.live_data_fetch.api_client import Broker
-obj = Broker()
+from lib.strategies.manager import Manager
+broker = Broker()
+manager= Manager() 
 import time
 
 while True:
-    values= obj.values
-    print(values)
+    values= broker.values
+    manager.place_order(values=values) 
     time.sleep(2)
