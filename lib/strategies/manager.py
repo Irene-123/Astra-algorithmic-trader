@@ -34,6 +34,7 @@ class Manager:
                         globals()[class_name] = getattr(module, class_name)
 
         print(Strategy.__subclasses__())
+        
     def place_order(self, order_values): 
         strat_obj= Strat() 
         # Strategy to be used, which will return the buy or sell signal 

@@ -6,9 +6,9 @@ import logging
 # ===========================================================================================
 BASE = os.path.dirname(os.path.abspath(__file__))
 MODULES_DIRECTORY = os.path.join(BASE, "lib/modules")
-LIVE_DATA_FETCH_DIRECTORY = os.path.join(MODULES_DIRECTORY, "live_data_fetch")
-BROKER_CREDENTIALS_FILE = os.path.join(LIVE_DATA_FETCH_DIRECTORY, "broker_credentials.json")
-SCRIP_MASTER_FILE = os.path.join(LIVE_DATA_FETCH_DIRECTORY, "script_master.csv")
+BROKER_DIRECTORY = os.path.join(MODULES_DIRECTORY, "broker")
+BROKER_CREDENTIALS_FILE = os.path.join(BROKER_DIRECTORY, "broker_credentials.json")
+SCRIP_MASTER_FILE = os.path.join(BROKER_DIRECTORY, "script_master.csv")
 LOGS_DIR = os.path.join(BASE, "logs")
 
 # LOGS
