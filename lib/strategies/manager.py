@@ -1,7 +1,8 @@
 import os
 import importlib
 from .template import Strategy
-
+from .towards_sma import TowardsSMA
+sma_obj= TowardsSMA() 
 
 class Strat:
     def __init__(self, instance, name) -> None:
@@ -17,8 +18,8 @@ class Strat:
         self.total_loss = 0 # Total loss made by unsuccessful trades
         self.profit_per_execution = 0   # Profit per successful trade (in percent)
         self.loss_per_execution = 0 # Loss per successful trade (in percent)
-
-
+        self.transactions=0 # total num of transactions/day 
+    
 class Manager:
     def __init__(self) -> None:
         self.strategies = list()    # List of [Strat]
@@ -33,4 +34,13 @@ class Manager:
                         globals()[class_name] = getattr(module, class_name)
 
         print(Strategy.__subclasses__())
+    def place_order(self, order_values): 
+        strat_obj= Strat() 
+        # Strategy to be used, which will return the buy or sell signal 
+        signal = sma_obj.run_strategy(order_values) 
+        if signal=='BUY' or signal=='SELL': 
+            strat_obj.transactions+= 1 
+        
+            
+
             
