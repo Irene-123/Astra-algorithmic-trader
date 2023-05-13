@@ -1,53 +1,53 @@
-import os 
-import psycopg2
-from .connection import * 
-import json 
 from sqlalchemy import create_engine
+import pandas as pd
 
+import settings
+from .connection import *
 
 
 class db_stat:
     def __init__(self) -> None:
-        self.successful_executions = 0  # Successful query executed by the db
-        self.unsuccessful_connections=0 # unsuccessful connections 
+        self.successful_executions = 0      # Successful query executed by the db
+        self.unsuccessful_connections = 0   # unsuccessful connections 
        
 
-# url = postgresql://kirtipurohit:1234@localhost:127.0.0.1/db_name
 class Manager:
     def __init__(self) -> None:
-        with open('lib/modules/database/db_credentials.json', 'r') as file: 
-            file= file.read() 
-            credentials= json.loads(file)
-        self.db_name= credentials['DATABASE']
-        self.username= credentials['USERNAME']
-        self.host= credentials['HOST']
-        self.password= credentials['PASSWORD']
-    def create_db(self): 
-        """Creates db
-        Args:
-            None
-        Returns:
-            true value if the db is created. 
-        """
+        self.setup_db()
 
-        url= f'postgresql://{self.username}:{self.password}@localhost:{self.host}/amm'
-        conn = psycopg2.connect(url)
-        cursor= conn.cursor() 
-        conn.autocommit = True
-        cursor.execute("SELECT 1 FROM pg_catalog.pg_database WHERE datname='historical_data';")
-        database_exists = cursor.fetchone()
-        if not database_exists:
-            create_db_query = "CREATE DATABASE historical_data;"
-            cursor.execute(create_db_query)
-        self.db_name= 'historical_data'
+    def setup_db(self): 
+        """Creates historical and user databases
+        
+        Returns:
+            bool: True for successful creation 
+        """
+        conn = connect_db(DEFAULT_DB)
+        cursor = conn.cursor() 
+
+        try:
+            cursor.execute(f"SELECT 1 FROM pg_catalog.pg_database WHERE datname='{settings.HISTORICAL_DB}';")
+            database_exists = cursor.fetchone()
+            if not database_exists:
+                create_db_query = f"CREATE DATABASE {settings.HISTORICAL_DB};"
+                cursor.execute(create_db_query)
+            
+            cursor.execute(f"SELECT 1 FROM pg_catalog.pg_database WHERE datname='{settings.USER_DB}';")
+            database_exists = cursor.fetchone()
+            if not database_exists:
+                create_db_query = f"CREATE DATABASE {settings.USER_DB};"
+                cursor.execute(create_db_query)
+        except Exception as e:
+            raise QueryFailedException(e)
+
         cursor.close()
         conn.close()
-    def add_ohlc_data(self, scrip_name): 
-        """ to add historical data based on scripname
+
+    def add_historical_data(self, scrip_name:str, candle_data:pd.DataFrame): 
+        """Add or update historical data
+
         Args:
-            scrip name(stock name)
-        Returns:
-            None 
+            scrip name (str): Unique scrip name
+            candle_data (pd.DataFrame): Candle data to add or update
         """
         if not self.db_name: 
             self.create_db() 
@@ -68,8 +68,10 @@ class Manager:
          
     def add_new_order(self, new_order):
         pass 
+
     def add_new_position(self, new_position):
-        pass 
+        pass
+
     def close_position(self, closed_position): 
         pass 
 

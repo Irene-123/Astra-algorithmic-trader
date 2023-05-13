@@ -8,6 +8,8 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 MODULES_DIRECTORY = os.path.join(BASE, "lib/modules")
 BROKER_DIRECTORY = os.path.join(MODULES_DIRECTORY, "broker")
 BROKER_CREDENTIALS_FILE = os.path.join(BROKER_DIRECTORY, "broker_credentials.json")
+DATABASE_DIRECTORY = os.path.join(MODULES_DIRECTORY, "database")
+DB_CREDENTIALS_FILE = os.path.join(DATABASE_DIRECTORY, "db_credentials.json")
 SCRIP_MASTER_FILE = os.path.join(BROKER_DIRECTORY, "script_master.csv")
 LOGS_DIR = os.path.join(BASE, "logs")
 
@@ -15,6 +17,10 @@ LOGS_DIR = os.path.join(BASE, "logs")
 VERBOSE = True
 STREAM_HANDLER_LOGGING_LEVEL = logging.INFO
 FILE_HANDLER_LOGGING_LEVEL = logging.INFO
+
+# DATABASE
+HISTORICAL_DB = "astra_historical_data"
+USER_DB = "astra_user_data" 
 
 # CREATION OF DIRECTORIES
 # ===========================================================================================
