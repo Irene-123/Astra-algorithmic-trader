@@ -6,13 +6,14 @@ from typing import List
 import pandas as pd
 import requests
 import threading
-
+import psycopg2
 from py5paisa import FivePaisaClient
 
 from .template import Broker
 from lib.modules.exceptions.broker_exceptions import *
 from utils.logger import get_logger
 import settings
+from ..database.database_manager import Manager
 
 
 class FivePaisa(Broker):
@@ -26,6 +27,8 @@ class FivePaisa(Broker):
         self.login()
         self.live_feed_thread = None
         self.live_feed_scrips = []
+        # Uncomment for db
+        # self.fetch_historical_data(scrip_name='SBIN', time_interval='1m', from_dt='2022-01-01', to_dt='2023-01-01')
     
     def login(self):
         """Creates a session with the broker (5Paisa) using two factor authentication
@@ -150,9 +153,9 @@ class FivePaisa(Broker):
             return False, response['Message']
         return True, response['BrokerOrderID']
 
-    def fetch_historical_data(self, scrip_name:str, time_interval:str, from_dt:str, to_dt:str) -> pd.DataFrame:
-        """Fetches historical data for the provided scrip
-
+    def fetch_historical_data(self, scrip_name:str, time_interval:str, from_dt:str, to_dt:str):
+        """Fetches historical data for the provided scrip and dumps data to database
+            by creating a new table. 
         Args:
             scrip_name (str): Name of the scrip
             time_interval (str): 1m, 5m, 10m, 15m, 30m, 60m, 1d
@@ -171,7 +174,10 @@ class FivePaisa(Broker):
             From = from_dt,
             To = to_dt
         )
-        return historical_data
+        # return historical_data
+        
+        # db_manager= Manager() 
+        # db_manager.dump_data(scrip_name, historical_data)
             
     def subscribe_scrips(self, scrip_names:list):
         #TODO
