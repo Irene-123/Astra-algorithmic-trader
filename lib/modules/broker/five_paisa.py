@@ -7,7 +7,7 @@ import pandas as pd
 import requests
 import threading
 from py5paisa import FivePaisaClient
-
+from lib.modules.database.database_manager import Manager
 from .template import Broker
 from lib.modules.exceptions.broker_exceptions import *
 from utils.logger import get_logger
@@ -25,8 +25,7 @@ class FivePaisa(Broker):
         self.login()
         self.live_feed_thread = None
         self.live_feed_scrips = []
-        # Uncomment for db
-        # self.fetch_historical_data(scrip_name='SBIN', time_interval='1m', from_dt='2022-01-01', to_dt='2023-01-01')
+        self.fetch_historical_data(scrip_name='SBIN', time_interval='1m', from_dt='2022-01-01', to_dt='2023-01-01')
     
     def login(self):
         """Creates a session with the broker (5Paisa) using two factor authentication
@@ -171,7 +170,10 @@ class FivePaisa(Broker):
             From = from_dt,
             To = to_dt
         )
+        db_manager= Manager() 
+        db_manager.dump_data(scrip_name, historical_data)
         return historical_data
+        
         
     def subscribe_scrips(self, scrip_names:list):
         #TODO
