@@ -1,8 +1,8 @@
-from datetime import datetime
+from datetime import datetime, time
 import json
 import os
 from typing import List
-
+import logger 
 import pandas as pd
 import requests
 import threading
@@ -25,7 +25,11 @@ class FivePaisa(Broker):
         self.login()
         self.live_feed_thread = None
         self.live_feed_scrips = []
-        self.fetch_historical_data(scrip_name='SBIN', time_interval='1m', from_dt='2022-01-01', to_dt='2023-01-01')
+        self.message='' 
+        self.scrip_names=['TITAN']
+        # self.fetch_historical_data(scrip_name='SBIN', time_interval='1m', from_dt='2022-01-01', to_dt='2023-01-01')
+        self.subscribe_scrips()
+        # self.fetch_candle_per_minute()
     
     def login(self):
         """Creates a session with the broker (5Paisa) using two factor authentication
@@ -170,12 +174,25 @@ class FivePaisa(Broker):
             From = from_dt,
             To = to_dt
         )
-        db_manager= Manager() 
-        db_manager.dump_data(scrip_name, historical_data)
+        # historical_data= self.client.historical_data('N','C',1660,'15m','2021-05-25','2021-06-16')
+        # db_manager= Manager() 
+        # db_manager.fetch_candles(scrip_name,  datetime(2021, 5, 25, 0, 0, 0), datetime(2021, 6, 10, 0, 0, 0)) 
+        # db_manager.dump_historical_data(scrip_name, historical_data)
         return historical_data
+    
+    def fetch_candle_per_minute(self):
+        while True:
+            current_datetime = datetime.datetime.now()
+            current_day = current_datetime.weekday()
+            current_hour = current_datetime.hour
+            
+            if current_day < 5 and 9 <= current_hour < 15:
+                self.message
+                #TODO 
+            time.sleep(60)
+
         
-        
-    def subscribe_scrips(self, scrip_names:list):
+    def subscribe_scrips(self):
         #TODO
         """Subscribes to the given scrips, and starts live streaming
 
@@ -185,9 +202,10 @@ class FivePaisa(Broker):
         def on_message(ws, message):
             print(ws)
             print(message)
+            self.message= message
 
         request_list = list()
-        for scrip_name in scrip_names:
+        for scrip_name in self.scrip_names:
             scrip_code = self.convert_value(from_type="Name", to_type="Scripcode", value=scrip_name)
             request_list.append({
                 "Exch": self.convert_value(from_type="Scripcode", to_type="Exch", value=scrip_code),
