@@ -1,4 +1,5 @@
-from lib.modules.broker.five_paisa import FivePaisa
-broker = FivePaisa()
-import time
+from lib.modules.broker.manager import Manager
+scrip_names=['TITAN', 'HDFCBANK']
+broker = Manager(scrip_names)
+broker.fetch_candles_per_minute()
 

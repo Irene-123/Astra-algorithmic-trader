@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import datetime
 import json
 import os
 from typing import List
@@ -7,17 +7,17 @@ import pandas as pd
 import requests
 import threading
 from py5paisa import FivePaisaClient
-from lib.modules.database.database_manager import Manager
+from lib.modules.database.database_manager import Manager as DBManager
 from .template import Broker
 from lib.modules.exceptions.broker_exceptions import *
 from utils.logger import get_logger
 import settings
-
+import time 
 
 class FivePaisa(Broker):
     """FivePaisa broker instance. Contains functions to interact with FivePaisa API. 
     """
-    def __init__(self) -> None:
+    def __init__(self, scrip_names) -> None:
         super().__init__()
         self.broker_name = "FivePaisa"
         self.logger = get_logger(logger_name=self.broker_name)
@@ -26,10 +26,10 @@ class FivePaisa(Broker):
         self.live_feed_thread = None
         self.live_feed_scrips = []
         self.message='' 
-        self.scrip_names=['TITAN']
-        # self.fetch_historical_data(scrip_name='SBIN', time_interval='1m', from_dt='2022-01-01', to_dt='2023-01-01')
+        self.scrip_names=scrip_names
+        self.db= DBManager()
+        # self.fetch_historical_data(scrip_name='SBIN', time_interval='1m', from_dt='2022-01-01', to_dt='2023-01-01') testpurpose
         self.subscribe_scrips()
-        # self.fetch_candle_per_minute()
     
     def login(self):
         """Creates a session with the broker (5Paisa) using two factor authentication
@@ -182,20 +182,20 @@ class FivePaisa(Broker):
     
     def fetch_candle_per_minute(self):
         while True:
-            current_datetime = datetime.datetime.now()
-            current_day = current_datetime.weekday()
-            current_hour = current_datetime.hour
-            
-            if current_day < 5 and 9 <= current_hour < 15:
-                self.message
-                #TODO 
+            for scrip in self.scrip_names:
+                data = self.fetch_historical_data(
+                    scrip_name=scrip,
+                    time_interval="1m",
+                    from_dt=datetime.now().strftime("%Y-%m-%d"),
+                    to_dt=datetime.now().strftime("%Y-%m-%d"),
+                )
+                self.db.dump_historical_data(scrip_name=scrip, historical_data=data)
             time.sleep(60)
 
         
     def subscribe_scrips(self):
         #TODO
         """Subscribes to the given scrips, and starts live streaming
-
         Args:
             scrip_names (list[str]): List containing scrip names
         """

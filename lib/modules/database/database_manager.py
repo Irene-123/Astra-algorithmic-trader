@@ -68,19 +68,17 @@ class Manager:
         create_table_sql = f'CREATE TABLE IF NOT EXISTS {table_name} (datetime TIMESTAMP PRIMARY KEY, open FLOAT, high FLOAT, \
         low FLOAT, close FLOAT, volume INTEGER);'
         cursor.execute(create_table_sql)
-
         column_names = list(historical_data.columns)
-
         # Define the SQL statement for the INSERT query
         insert_query = f"INSERT INTO {table_name} ({', '.join(column_names)}) VALUES %s"
         # data = [tuple(row) for row in historical_data.itertuples(index=False)]
-        data= self.dump_new_candles(cursor=cursor, table_name=table_name, historical_data=historical_data)
+        data= self.dump_candles_helper(cursor=cursor, table_name=table_name, historical_data=historical_data)
         execute_values(cursor, insert_query, data)
         cursor.close() 
         conn.close() 
 
 
-    def dump_new_candles(self, cursor, table_name, historical_data): 
+    def dump_candles_helper(self, cursor, table_name, historical_data): 
         query = f"SELECT EXISTS(SELECT 1 FROM {table_name})"
         cursor.execute(query)
         has_rows = cursor.fetchone()[0]
@@ -98,7 +96,7 @@ class Manager:
                     fetched_datetime = last_row[0]
             except QueryFailedException as e: 
                 raise e + "Could not fetch last column datetime"
-            curr_datetime= historical_data.at[1, "Datetime"]
+            curr_datetime= datetime.strptime(historical_data.at[1, "Datetime"], '%Y-%m-%dT%H:%M:%S')
             if curr_datetime < fetched_datetime: # select rows after the 
                 historical_data['Datetime'] = pd.to_datetime(historical_data['Datetime'])
                 rows = historical_data[historical_data['Datetime'] > fetched_datetime]
@@ -112,6 +110,10 @@ class Manager:
         except ConnectionError as e:
             raise e + f"while fetching the latest candle from {scrip_name}"
         cursor= conn.cursor() 
+        cursor.execute(f"SELECT 1 FROM pg_catalog.pg_table WHERE tablename = '{scrip_name.lower()}'")
+        exists = cursor.fetchone()
+        if not exists: 
+            return False 
         query = f"SELECT * FROM {scrip_name.lower()} ORDER BY {order_column} DESC LIMIT 1"
         cursor.execute(query)
         last_row = cursor.fetchone()
@@ -127,6 +129,10 @@ class Manager:
         except ConnectionError as e:
             raise e + f"while fetching candles from {scrip_name}"
         cursor= conn.cursor() 
+        cursor.execute(f"SELECT 1 FROM pg_catalog.pg_table WHERE tablename = '{scrip_name.lower()}'")
+        exists = cursor.fetchone()
+        if not exists: 
+            return False 
         query = f"SELECT * FROM {scrip_name} WHERE datetime >= '{start_datetime}' AND datetime <= '{end_datetime}';"
         cursor.execute(query)
         rows = cursor.fetchall()
