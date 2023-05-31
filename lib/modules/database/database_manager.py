@@ -96,11 +96,13 @@ class Manager:
                     fetched_datetime = last_row[0]
             except QueryFailedException as e: 
                 raise e + "Could not fetch last column datetime"
-            curr_datetime= datetime.strptime(historical_data.at[1, "Datetime"], '%Y-%m-%dT%H:%M:%S')
+            curr_datetime= datetime.strptime(historical_data.at[1, "Datetime"], '%Y-%m-%d Y%H:%M:%S')
             if curr_datetime < fetched_datetime: # select rows after the 
                 historical_data['Datetime'] = pd.to_datetime(historical_data['Datetime'])
                 rows = historical_data[historical_data['Datetime'] > fetched_datetime]
                 data = [tuple(row) for row in rows.itertuples(index=False)]
+            data['datetime'] = pd.to_datetime(data['datetime'])
+            data['datetime'] = data['datetime'].dt.strftime('%Y-%m-%d %H:%M:%S')
         return data 
     
     def fetch_latest_candle_from_db(self, scrip_name): 
@@ -120,8 +122,8 @@ class Manager:
         return last_row
     
     def fetch_candles_from_db(self, scrip_name, start_datetime, end_datetime): 
-        start_datetime = start_datetime.strftime('%Y-%m-%d %H:%M:%S')
-        end_datetime = end_datetime.strftime('%Y-%m-%d %H:%M:%S')
+        start_datetime = datetime.strptime(start_datetime, '%Y-%m-%d %H:%M:%S')
+        end_datetime = datetime.strptime(end_datetime, '%Y-%m-%d %H:%M:%S')
         if end_datetime < start_datetime: 
             raise RuntimeError("End datetime should be greater than the start time")
         try:
@@ -129,10 +131,10 @@ class Manager:
         except ConnectionError as e:
             raise e + f"while fetching candles from {scrip_name}"
         cursor= conn.cursor() 
-        cursor.execute(f"SELECT 1 FROM pg_catalog.pg_table WHERE tablename = '{scrip_name.lower()}'")
+        cursor.execute(f"SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '{scrip_name.lower()}' );")
         exists = cursor.fetchone()
-        if not exists: 
-            return False 
+        if exists[0] is False: 
+            return [] 
         query = f"SELECT * FROM {scrip_name} WHERE datetime >= '{start_datetime}' AND datetime <= '{end_datetime}';"
         cursor.execute(query)
         rows = cursor.fetchall()
