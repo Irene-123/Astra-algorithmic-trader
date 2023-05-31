@@ -2,7 +2,6 @@ from datetime import datetime
 import json
 import os
 from typing import List
-import logger 
 import pandas as pd
 import requests
 import threading

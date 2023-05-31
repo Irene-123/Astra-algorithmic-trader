@@ -1,8 +1,7 @@
 import os
 import importlib
 from .template import Strategy
-from .towards_sma import TowardsSMA
-sma_obj= TowardsSMA() 
+from multiprocessing import Queue
 
 class Strat:
     def __init__(self, instance, name) -> None:
@@ -18,11 +17,13 @@ class Strat:
         self.total_loss = 0 # Total loss made by unsuccessful trades
         self.profit_per_execution = 0   # Profit per successful trade (in percent)
         self.loss_per_execution = 0 # Loss per successful trade (in percent)
-        self.transactions=0 # total num of transactions/day 
+        self.transactions = 0 # total num of transactions/day 
+    
     
 class Manager:
     def __init__(self) -> None:
         self.strategies = list()    # List of [Strat]
+        self.call_queue = Queue()
 
     def load_strategies(self):
         for file_name in os.listdir(os.path.dirname(__file__)):
@@ -33,8 +34,14 @@ class Manager:
                     if isinstance(getattr(module, class_name), type):
                         globals()[class_name] = getattr(module, class_name)
 
-        print(Strategy.__subclasses__())
-        
+        for strategy in Strategy.__subclasses__():
+            inst = strategy(manager_ipc=self.call_queue)
+            self.strategies.append(
+                Strat(
+                    instance = inst,
+                    name = inst.name
+                )
+            )
 
         
             
