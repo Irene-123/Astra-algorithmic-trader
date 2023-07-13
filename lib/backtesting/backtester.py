@@ -1,6 +1,7 @@
 import pandas as pd
 from lib.strategies.template import TradeCall
 from lib.strategies.towards_sma import TowardsSMA
+from lib.strategies.dca import DCA
 
 
 class Metrics:
@@ -39,7 +40,7 @@ NET GAIN : {self.total_gains_from_trades}
 
 class Backtester:
     def __init__(self) -> None:
-        self.strategy = TowardsSMA(None, "1d")
+        self.strategy = DCA(None, "1d")
         self.metrics = Metrics()
         self.reset()
 
@@ -51,10 +52,11 @@ class Backtester:
         self.trades = {"Datetime":[], "Action":[], "Price": []}
 
     def generate_trades_csv(self, scrip):
+        breakpoint() 
         trades = pd.DataFrame(self.trades).reset_index(drop=True)
         historical_data = self.strategy.historical_data[scrip].iloc[30:].reset_index(drop=True)
         merged = pd.merge(historical_data, trades, on='Datetime', how='outer')
-        merged = merged.drop('index', axis=1).fillna('NONE')
+        # merged = merged.fillna('NA')
         merged.to_csv(f"lib/backtesting/backtest-data/{scrip}-backtest.csv")
 
     def place_order(self, order_type:str, price:float, timestamp:str):
@@ -95,21 +97,20 @@ class Backtester:
                 if price <= self.last_call.price:
                     self.place_order(order_type = "BUY", price = price, timestamp = timestamp)
                     self.is_trade_running = True
-            elif self.last_call.call_type == "SELL":
-                if price >= self.last_call.price:
-                    self.place_order(order_type = "SELL", price = price, timestamp = timestamp)
-                    self.is_trade_running = True
+            # elif self.last_call.call_type == "SELL":
+            #     if price >= self.last_call.price:
+            #         self.place_order(order_type = "SELL", price = price, timestamp = timestamp)
+            #         self.is_trade_running = True
 
     def run_backtest(self, scrips:list):
         dataset = dict()
         for scrip in scrips:
             dataset[scrip] = pd.read_csv(f"lib/backtesting/data/{scrip}.csv", index_col=0)
-        
         historical_data = dict()
         # Initialize the strategy with first 30 candles
         for scrip in scrips:
-            historical_data[scrip] = dataset[scrip].head(30)
-            dataset[scrip] = dataset[scrip].iloc[30:]
+            historical_data[scrip] = dataset[scrip].head(30).reset_index()
+            dataset[scrip] = dataset[scrip].iloc[30:].reset_index() 
         
         self.strategy.initialize_strategy(
             scrips = scrips, 
@@ -121,17 +122,15 @@ class Backtester:
                 candle = dataset[scrip].head(1)
                 self.strategy.add_new_candle(scrip=scrip, candle=candle)
                 dataset[scrip] = dataset[scrip].iloc[1:]
-                
                 self.check_entry(price = float(candle["Close"].iloc[0]), timestamp = candle['Datetime'].iloc[0])
                 self.check_exit(price = float(candle["Close"].iloc[0]), timestamp = candle['Datetime'].iloc[0])
                 if self.is_trade_running is True:   # only one trade can run at any given time
-                    self.strategy.run_logic(scrip)
+                    self.strategy.run_logic(scrip, datetime= candle['Datetime'].iloc[0])
                     continue
-                
-                call = self.strategy.run_logic(scrip)
-                if call.call_type != "NONE":    # Trade call received
+                # breakpoint()
+                call = self.strategy.run_logic(scrip, datetime=candle['Datetime'].iloc[0])
+                if call!= None and call.call_type != "NONE":    # Trade call received
                     self.last_call = call
-            
             self.generate_trades_csv(scrip)
             print(self.metrics)
             self.reset()

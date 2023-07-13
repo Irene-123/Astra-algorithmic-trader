@@ -88,7 +88,7 @@ class Manager:
         else: #table is not empty 
             order_column = 'datetime'  # Replace with the appropriate column name
             query = f"SELECT * FROM {table_name} ORDER BY {order_column} DESC LIMIT 1"
-
+            data=[] 
             cursor.execute(query)
             last_row = cursor.fetchone()
             try: 
@@ -96,11 +96,13 @@ class Manager:
                     fetched_datetime = last_row[0]
             except QueryFailedException as e: 
                 raise e + "Could not fetch last column datetime"
-            curr_datetime= datetime.strptime(historical_data.at[1, "Datetime"], '%Y-%m-%d Y%H:%M:%S')
+            curr_datetime= datetime.strptime(historical_data.at[1, "Datetime"], '%Y-%m-%dT%H:%M:%S')
             if curr_datetime < fetched_datetime: # select rows after the 
                 historical_data['Datetime'] = pd.to_datetime(historical_data['Datetime'])
                 rows = historical_data[historical_data['Datetime'] > fetched_datetime]
                 data = [tuple(row) for row in rows.itertuples(index=False)]
+            if data==[]:
+                return [tuple(row) for row in historical_data.itertuples(index=False)]
             data['datetime'] = pd.to_datetime(data['datetime'])
             data['datetime'] = data['datetime'].dt.strftime('%Y-%m-%d %H:%M:%S')
         return data 
