@@ -2,7 +2,9 @@ import pandas as pd
 from lib.strategies.template import TradeCall
 from lib.strategies.towards_sma import TowardsSMA
 from lib.strategies.dca import DCA
-
+from lib.strategies.adx_rsi import ADX_RSI
+from lib.modules.broker.manager import Manager as BrokerManager
+from lib.modules.database.database_manager import Manager as DatabaseManager
 
 class Metrics:
     def __init__(self) -> None:
@@ -40,7 +42,7 @@ NET GAIN : {self.total_gains_from_trades}
 
 class Backtester:
     def __init__(self) -> None:
-        self.strategy = DCA(None, "1d")
+        self.strategy = ADX_RSI(None, "1d")
         self.metrics = Metrics()
         self.reset()
 
@@ -52,7 +54,7 @@ class Backtester:
         self.trades = {"Datetime":[], "Action":[], "Price": []}
 
     def generate_trades_csv(self, scrip):
-        breakpoint() 
+        # breakpoint() 
         trades = pd.DataFrame(self.trades).reset_index(drop=True)
         historical_data = self.strategy.historical_data[scrip].iloc[30:].reset_index(drop=True)
         merged = pd.merge(historical_data, trades, on='Datetime', how='outer')
@@ -105,12 +107,21 @@ class Backtester:
     def run_backtest(self, scrips:list):
         dataset = dict()
         for scrip in scrips:
-            dataset[scrip] = pd.read_csv(f"lib/backtesting/data/{scrip}.csv", index_col=0)
+            try:
+                dataset[scrip] = pd.read_csv(f"lib/backtesting/data/{scrip}.csv", index_col=0)
+            except FileNotFoundError:
+                broker= BrokerManager([scrip])
+                db_manager= DatabaseManager() 
+                broker.fetch_new_candle(timeframes=[('2023-01-15 09:20:00', '2023-06-14 03:00:00')])
+                db_manager.save_data_to_csv([scrip])
+                dataset[scrip] = pd.read_csv(f"lib/backtesting/data/{scrip}.csv", index_col=0)
+               
+            dataset[scrip]= dataset[scrip][:2000]
         historical_data = dict()
         # Initialize the strategy with first 30 candles
         for scrip in scrips:
-            historical_data[scrip] = dataset[scrip].head(30).reset_index()
-            dataset[scrip] = dataset[scrip].iloc[30:].reset_index() 
+            historical_data[scrip] = dataset[scrip].head(100).reset_index()
+            dataset[scrip] = dataset[scrip].iloc[100:].reset_index() 
         
         self.strategy.initialize_strategy(
             scrips = scrips, 
@@ -125,10 +136,11 @@ class Backtester:
                 self.check_entry(price = float(candle["Close"].iloc[0]), timestamp = candle['Datetime'].iloc[0])
                 self.check_exit(price = float(candle["Close"].iloc[0]), timestamp = candle['Datetime'].iloc[0])
                 if self.is_trade_running is True:   # only one trade can run at any given time
-                    self.strategy.run_logic(scrip, datetime= candle['Datetime'].iloc[0])
+                    self.strategy.run_logic(scrip, datetime= candle['Datetime'].iloc[0]) # , datetime= candle['Datetime'].iloc[0]
                     continue
                 # breakpoint()
-                call = self.strategy.run_logic(scrip, datetime=candle['Datetime'].iloc[0])
+                call = self.strategy.run_logic(scrip, datetime= candle['Datetime'].iloc[0])
+                print(call)
                 if call!= None and call.call_type != "NONE":    # Trade call received
                     self.last_call = call
             self.generate_trades_csv(scrip)

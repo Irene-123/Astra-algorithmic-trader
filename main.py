@@ -5,10 +5,12 @@
 # # # broker.fetch_candles_per_minute() #TODO: convert to thread
 # broker.fetch_new_candle(timeframes=timeframes)
 
-# from lib.strategies.template import Strategy, TradeCall
-# from lib.strategies.dca import DCA
-# from multiprocessing import Queue
-# from lib.backtesting.results import *
-# from lib.backtesting.backtester import Backtester
+from lib.strategies.template import Strategy, TradeCall
+from lib.strategies.dca import DCA
+from multiprocessing import Queue
+from lib.backtesting.results import *
+from lib.backtesting.backtester import Backtester
 
 
+backtester= Backtester()
+backtester.run_backtest( ["FEDERALBNK"])

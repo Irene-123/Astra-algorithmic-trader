@@ -142,6 +142,22 @@ class Manager:
         rows = cursor.fetchall()
         return rows 
     
+    def save_data_to_csv(self, scrip_names:list):
+        for scrip_name in scrip_names:
+            conn= connect_db("ASTRA_HISTORICAL_DATA")  
+            cursor= conn.cursor() 
+            cursor.execute(f"SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '{scrip_name.lower()}' );")
+            exists = cursor.fetchone()
+            if exists[0] is False: 
+                continue 
+            query = f"SELECT * FROM {scrip_name};"
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            df = pd.DataFrame(rows, columns=['Datetime', 'Open', 'High', 'Low', 'Close', 'Volume'])
+            df.to_csv(f"lib/backtesting/data/{scrip_name}.csv", index=False)
+            cursor.close() 
+            conn.close()
+    
     def add_new_order(self, new_order):
         pass 
 

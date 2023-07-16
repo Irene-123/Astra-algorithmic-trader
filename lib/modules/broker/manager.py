@@ -11,9 +11,10 @@ class Manager:
         self.broker = FivePaisa(scrip_names)
         self.db = DbManager()
 
-    def fetch_new_candle(self, timeframes: list):
+    def fetch_new_candle(self, timeframes=None):
         """
         Fetches new candle data for the given scrips with timeframe and returns the dataframe 
+        timefraemes: list of tuples of start and end datetime
         """
         while True: 
             for scrip, timeframe in zip(self.scrip_names, timeframes):
