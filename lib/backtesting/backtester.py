@@ -5,6 +5,7 @@ from lib.strategies.dca import DCA
 from lib.strategies.adx_rsi import ADX_RSI
 from lib.modules.broker.manager import Manager as BrokerManager
 from lib.modules.database.database_manager import Manager as DatabaseManager
+from lib.strategies.decision_factor import DecisionFactor 
 
 class Metrics:
     def __init__(self) -> None:
@@ -140,7 +141,7 @@ class Backtester:
                     continue
                 # breakpoint()
                 call = self.strategy.run_logic(scrip, datetime= candle['Datetime'].iloc[0])
-                print(call)
+                # print(call)
                 if call!= None and call.call_type != "NONE":    # Trade call received
                     self.last_call = call
             self.generate_trades_csv(scrip)

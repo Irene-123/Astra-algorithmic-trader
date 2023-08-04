@@ -5,12 +5,13 @@
 # # # broker.fetch_candles_per_minute() #TODO: convert to thread
 # broker.fetch_new_candle(timeframes=timeframes)
 
-from lib.strategies.template import Strategy, TradeCall
-from lib.strategies.dca import DCA
+
 from multiprocessing import Queue
 from lib.backtesting.results import *
 from lib.backtesting.backtester import Backtester
+from lib.backtesting.results import *
 
 
 backtester= Backtester()
-backtester.run_backtest( ["FEDERALBNK"])
+backtester.run_backtest(["SUNPHARMA"])
+generate_plot_adx_rsi("SUNPHARMA")

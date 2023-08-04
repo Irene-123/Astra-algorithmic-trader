@@ -4,7 +4,7 @@ import time
 
 from multiprocessing import Queue
 from lib.strategies.template import Strategy, TradeCall
-
+from lib.strategies.decision_factor import DecisionFactor
 
 def get_adx(high, low, close, lookback):
     plus_dm = high.diff()
@@ -95,7 +95,6 @@ class ADX_RSI(Strategy):
     def run_logic(self, scrip:str, datetime= None):
         i= self.historical_data[scrip].index[self.historical_data[scrip]['Datetime'] == datetime].tolist()[0]
         data= self.historical_data[scrip]
-        # breakpoint()
         data['plus_di'] = pd.DataFrame(get_adx(data['High'], data['Low'], data['Close'], 14)[0]).rename(columns = {0:'plus_di'})
         data['minus_di'] = pd.DataFrame(get_adx(data['High'], data['Low'], data['Close'], 14)[1]).rename(columns = {0:'minus_di'})
         data['adx'] = pd.DataFrame(get_adx(data['High'], data['Low'], data['Close'], 14)[2]).rename(columns = {0:'adx'})
@@ -107,8 +106,38 @@ class ADX_RSI(Strategy):
         pdi = data['plus_di']
         ndi = data['minus_di']
         rsi = data['rsi_14'] 
-        # close_price = aapl['Close']
-        if adx[i] > 25 and pdi[i] < ndi[i] and rsi[i] < 40: 
+        
+        if_sell = adx[i] > 25 and pdi[i] < ndi[i] and rsi[i] < 30
+        if_buy= adx[i] < 25 and pdi[i] > ndi[i] and rsi[i] > 70
+        ongoing_trade= self.current_call[scrip] == None or self.current_call[scrip] == "BUY"
+        current_price =self.historical_data[scrip]['Close'].iloc[-1]
+        sell_at_higher=False
+        try: 
+            bought_price = self.current_price[scrip]
+            
+            if if_sell and ongoing_trade:
+                if current_price > bought_price*(1.05):
+                    sell_at_higher=True
+        except KeyError:
+            print("Stock not yet bought")
+                
+        
+        
+        # human_decision= percentage achieved from the decision factor function, pass 
+        # machine_decision= percentage achieved from the machine decision function
+        # risk factor = percentage achieved from factors not decided
+
+        
+
+        # For human_decision part
+        # if ongoing trade:
+        #    if I get signal to sell: 
+        #       Check if the current price > buy price + 10%
+        #             if yes: sell
+        #             else: hold
+        # Update the metrics:
+        # sell_dodged+= 1 
+        if if_sell: 
             if self.current_call[scrip] == None or self.current_call[scrip] == "BUY":
                 self.current_call[scrip] = "SELL"
                 self.current_price[scrip] = None 
@@ -121,7 +150,7 @@ class ADX_RSI(Strategy):
                 trailing_stoploss = 0.005 * self.historical_data[scrip]['Close'].iloc[-1]
             ) 
             
-        elif adx[i] < 25 and pdi[i] > ndi[i] and rsi[i] > 70:
+        elif if_buy:
             if self.current_call[scrip] == None or self.current_call[scrip] == "SELL":
                 self.current_call[scrip] = "BUY"
                 self.current_price[scrip] = self.historical_data[scrip]['Close'].iloc[-1]
