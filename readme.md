@@ -1,55 +1,58 @@
-# ASTRA-ALGO-TRADER
-Automated Stock Trader Bot and Utility software
+# ASTRA-ALGO-TRADER 🚀
 
+Automated Stock Trader Bot and Utility software 📈💰
 
-## Database interface
-- Write the scrip_name in the Backtester function and it will fetch data (you don't know what happens in background)
-- It first searches the cache files => database => fetches from broker => puts in db & cache
-- Carries on with the task you were performing
+## Database Interface 🗄️
 
-### Fetch candle per minute script. 
-- Provide scrip names
-  ```
-  scrip_names=['TITAN', 'HDFCBANK']
-  broker = Manager(scrip_names)
-  broker.fetch_candles_per_minute()
-  ```
-- This will fetch the data from API and dump in database. 
+- Simply write the `scrip_name` in the Backtester function, and let the magic happen in the background ✨
+- The system first checks cache files database and fetches data from the broker if needed then stores in the database and cache
+- Continue with your tasks while the data retrieval and storage are taken care of!
 
-### Fetch candles from database (NO API request) 
- - 2 functions: `fetch_latest_candle()` & `fetch_candles()`
- - They will fetch the data from db, if not present, will fetch from API 
- - and return the `dataframe`
+### Fetch Candle per Minute Script 🔥
 
+- Provide the `scrip` names, and this script will fetch data from the API and securely dump it into the database 📊
+
+### Fetch Candles from Database (NO API Request)
+
+- Two functions at your service: `fetch_latest_candle()` & `fetch_candles()`
+- They efficiently fetch the data from the database, and if not available, gracefully fetch it from the API
+- Returns a handy `dataframe` for your analysis and trading strategies
 
 ## Components
-- Virtual Trading : User simulation with a set of strategies and fixed balance 
-- Paper Trading : Strategy execution in virtual environment
-- Backtesting : Strategy performance in past data
-- Real Trading : Live trading in the market
 
-## API Limits
-Trade orders : 200 reqs/minute
-Other APIs : 50 reqs/minute
+- **Virtual Trading**: Experience simulation with a set of strategies and a fixed balance. Test the waters before diving into the real market 
+
+- **Paper Trading**: Execute your strategies in a virtual environment with real-world data. Sharpen your skills and refine your approach before trading live.
+
+- **Backtesting**: Test your strategies' performance in the past data. Analyze and optimize your algorithms for better results
+
+- **Real Trading**: Live trading in the actual market. Put your well-tested strategies to the ultimate test and watch your profits grow! 💹💰
+
+## API Limits ⏱️
+
+- Trade orders: 200 reqs/minute
+- Other APIs: 50 reqs/minute
+
+## Ongoing Issues 🚧
+
+- Set different strategies for different stocks based on short-term or long-term goals
+- Identify if the strategy is actually worth live-trading. Test, analyze, and choose wisely
+
+## Idea 💡
+
+**Decision:** Combine Basic Logic + Mathematical Logic + Risk Factor to craft powerful strategies
+
+- **Basic Logic:** Buy when Current Price > Bought Price + 5-10 Rs (make calculated decisions)
+- **Basic Logic:** Identify market trends and predict near peaks
+- **Mathematical Logic:** Leverage algorithms like momentum, RSI, ADX, and SMA
+- **Risk Factor:** Implement stop-loss mechanisms to mitigate potential market crashes
+- **Risk Factor:** Keep track of the number of successful decisions dodged (buy/sell)
+
+
+---
 
 
 
-## Ongoing issues
-
-- Set different strategies for different stocks based on Short-term or long-term
-- Identify if the strategy is actually worth live-trading
-- 
-
-# Idea
-
-Decision: Basic Logic + Mathematical logic + Risk factor 
-
-Basic Logic: Current > Bought + 5-10rs (count decisions) 
-Basic Logic: The market seems to be rising & or already near a peak 
-
-Mathematical Logic: using a algorithm like momentum, ML ==> RSI, ADX, SMA
-
-Risk Factor: market crashing, stop loss helps, number of decisions dodged (buy/sell) 
 
 
 
