@@ -5,7 +5,7 @@ from lib.strategies.dca import DCA
 from lib.strategies.adx_rsi import ADX_RSI
 from lib.modules.broker.manager import Manager as BrokerManager
 from lib.modules.database.database_manager import Manager as DatabaseManager
-from lib.strategies.decision_factor import DecisionFactor 
+
 
 class Metrics:
     def __init__(self) -> None:
